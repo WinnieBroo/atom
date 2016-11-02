@@ -1,1 +1,1 @@
-cat perl.txt | perl -E 'my $it1=-1; my $it2=0; while(<>) {my @qwe = split(";", $_); $it1++; if ($qwe[4]>1024) {$it2++; print $_}}; print "Total:$it1\nExpr:$it2\n"'
+cat perl.txt | perl -naF';' -E 'BEGIN {$iter=0}; if ($F[4]>1024) {$iter++; print $_}; END{print "Total:$.\nExpr:$iter\n"}'
