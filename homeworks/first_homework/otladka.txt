@@ -1,0 +1,17 @@
+l
+l 6+15
+w $row
+w $array[$iter]
+c
+c
+c
+p Dumper($array[$iter])
+W $array[$iter]
+p $array[$iter]
+L
+p
+T
+!
+p $array[$iter]
+r
+#save otladka.txt
