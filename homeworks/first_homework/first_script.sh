@@ -1,1 +1,1 @@
-ls -l | perl -n -e 'my @qw = split(" ", $_); my $i = 0; if ($qw[2]) {foreach $elem (@qw) {if ($i<8) {print $elem.";"} else {if ($qw[$i+1]) {print $elem." "} else {print $elem}}} continue {$i++}; print "\n"}' > perl.txt
+ls -l | perl -n -e 'my @qw = split(" ", $_, 9); if (qw[2]) {for (@qw) {print $_.";"} continue {$_++}}'
