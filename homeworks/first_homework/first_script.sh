@@ -1,0 +1,1 @@
+ls -l | perl -n -e 'my @qw = split(" ", $_); my $i = 0; foreach $elem (@qw) {if ($i<8) {print $elem.";"} else {print $elem." "}} continue {$i++}; print "\n"' > perl.txt
