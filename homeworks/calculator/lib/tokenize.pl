@@ -16,7 +16,15 @@
 use 5.010;
 use strict;
 use warnings;
-use diagnostics;
+#use diagnostics;
+use Data::Dumper;
+
+use constant OPER => 1; 
+use constant NUM => 2;
+use constant UNAR => 3;
+use constant OPBKT => 4;
+use constant CLBKT => 5;
+
 BEGIN{
 	if ($] < 5.018) {
 		package experimental;
@@ -28,10 +36,51 @@ no warnings 'experimental';
 sub tokenize {
 	chomp(my $expr = shift);
 	my @res;
+	my @source = split m{((?<!e)[-+]|[*()/^]|\s+)}, $expr;
 
-	# ...
+	my $state = 0;
+	my $cnt = 0; # counter of brackets
 
-	return \@res;
+	for my $bang (@source) {
+		given ($bang) {
+			when (/^\s+$/) {};
+
+			when (/^d*\.?\d+([eE][+-]?\d+)?$/) {
+				unless ($state == NUM or $state == CLBKT) {push(@res, $bang); $state = NUM}
+			};
+
+			when (/[+-]/) {
+				if ($state == NUM or $state == CLBKT) {push (@res, $bang); $state=OPER}
+				else {push(@res,("U".$bang)); $state=UNAR;}
+			};
+
+			when (/[\*\/\^]/) {
+				if ($state == NUM or $state == CLBKT) {push (@res, $bang); $state=OPER}
+				else {die '$!'}
+			};
+
+			when ('(') {
+				if ($state == 0 or $state == OPER or $state == UNAR) 
+				{push (@res, $bang); $state=OPBKT; $cnt++}
+			};
+
+			when (')') {
+				if ($state == NUM) {push (@res, $bang); $state=CLBKT; $cnt--}
+				if ($cnt < 0) {die "Wrong count of brackets: '$expr'"}
+			};
+
+			default {
+				die "Bad: '$_'";
+			}
+		}
+	}
+
+	unless ($state == NUM) {die "No nums or wrong expression! '$expr'"};
+
+	print Dumper(@res);
+
 }
+
+my $i = tokenize(shift);
 
 1;
