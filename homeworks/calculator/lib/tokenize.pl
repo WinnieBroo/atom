@@ -45,7 +45,7 @@ sub tokenize {
 		given ($bang) {
 			when (/^\s+$/) {};
 
-			when (/^d*\.?\d+([eE][+-]?\d+)?$/) {
+			when (/^d*\.?\d+([e ][+-]?\d+)?$/) {
 				unless ($state == NUM or $state == CLBKT) {push(@res, $bang); $state = NUM}
 			};
 
@@ -59,12 +59,12 @@ sub tokenize {
 				else {die '$!'}
 			};
 
-			when ('(') {
+			when (/\(/) {
 				if ($state == 0 or $state == OPER or $state == UNAR) 
 				{push (@res, $bang); $state=OPBKT; $cnt++}
 			};
 
-			when (')') {
+			when (/\)/) {
 				if ($state == NUM) {push (@res, $bang); $state=CLBKT; $cnt--}
 				if ($cnt < 0) {die "Wrong count of brackets: '$expr'"}
 			};
@@ -77,10 +77,17 @@ sub tokenize {
 
 	unless ($state == NUM) {die "No nums or wrong expression! '$expr'"};
 
-	print Dumper(@res);
+	#print Dumper(@res);
+	return \@res;
 
 }
 
-my $i = tokenize(shift);
+unless (caller) {
+	use Data::Dumper;
+	while (my $expression = <>) {
+		next if $expression =~ /^\s+$/;
+		print Dumper(tokenize($expression))
+	}
+}
 
 1;
