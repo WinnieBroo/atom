@@ -19,10 +19,30 @@ no warnings 'experimental';
 
 sub evaluate {
 	my $rpn = shift;
+	my @stack;
+	for my $foo (@{$rpn}){
+		given ($foo) {
+			when (/[+-\*\/\^]/){
+				my $x = pop(@stack);
+				my $y = pop(@stack);
+				given ($foo) {
+					when ("*") {push (@stack, $x * $y)}
+					when ("/") {push (@stack, $x / $y)}
+					when ("-") {push (@stack, $x - $y)}
+					when ("+") {push (@stack, $x + $y)}
+					when ("^") {push (@stack, $x ^ $y)}
+				}
+			}
+			when (['U+', 'U-']) {
+				if ($foo eq 'U-') { my $x = pop(@stack); push(@stack, -$x)}
+			}
+			default{
+				push(@stack);
+			}
+		}
+	}
 
-	# ...
-
-	return 0;
+	return pop(@stack);
 }
 
 1;

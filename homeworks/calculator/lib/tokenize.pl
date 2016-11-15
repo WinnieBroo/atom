@@ -36,7 +36,7 @@ no warnings 'experimental';
 sub tokenize {
 	chomp(my $expr = shift);
 	my @res;
-	my @source = split m{((?<!e)[-+]|[*()/^]|\s+)}, $expr;
+	my @source = split m{((?<!e)[-+]|[*\(\)/^]|\s+)}, $expr;
 
 	my $state = 0;
 	my $cnt = 0; # counter of brackets
@@ -59,25 +59,23 @@ sub tokenize {
 				else {die '$!'}
 			};
 
-			when (/\(/) {
+			when ('(') {
 				if ($state == 0 or $state == OPER or $state == UNAR) 
 				{push (@res, $bang); $state=OPBKT; $cnt++}
 			};
 
-			when (/\)/) {
+			when (')') {
 				if ($state == NUM) {push (@res, $bang); $state=CLBKT; $cnt--}
 				if ($cnt < 0) {die "Wrong count of brackets: '$expr'"}
 			};
 
 			default {
-				die "Bad: '$_'";
-			}
+				die "Bad: ''";
+			};
 		}
 	}
 
-	unless ($state == NUM) {die "No nums or wrong expression! '$expr'"};
-
-	#print Dumper(@res);
+	unless ($state == NUM) {die "Wrong expression! '$expr'"};
 	return \@res;
 
 }
